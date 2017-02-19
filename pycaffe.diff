@@ -1,0 +1,36 @@
+diff --git a/include/caffe/solver.hpp b/include/caffe/solver.hpp
+index a28d8cb..3cab77d 100644
+--- a/include/caffe/solver.hpp
++++ b/include/caffe/solver.hpp
+@@ -73,6 +73,7 @@ class Solver {
+     return test_nets_;
+   }
+   int iter() const { return iter_; }
++  void set_iter(int iter) { iter_ = iter; }
+ 
+   // Invoked at specific points during an iteration
+   class Callback {
+@@ -94,9 +95,9 @@ class Solver {
+    */
+   virtual inline const char* type() const { return ""; }
+ 
+- protected:
+   // Make and apply the update value for the current iteration.
+   virtual void ApplyUpdate() = 0;
++ protected:
+   string SnapshotFilename(const string extension);
+   string SnapshotToBinaryProto();
+   string SnapshotToHDF5();
+diff --git a/python/caffe/_caffe.cpp b/python/caffe/_caffe.cpp
+index 3589e47..ab790a9 100644
+--- a/python/caffe/_caffe.cpp
++++ b/python/caffe/_caffe.cpp
+@@ -452,6 +452,8 @@ BOOST_PYTHON_MODULE(_caffe) {
+     .add_property("test_nets", bp::make_function(&Solver<Dtype>::test_nets,
+           bp::return_internal_reference<>()))
+     .add_property("iter", &Solver<Dtype>::iter)
++    .def("set_iter", &Solver<Dtype>::set_iter)
++    .def("apply_update", &Solver<Dtype>::ApplyUpdate)
+     .def("add_callback", &Solver_add_callback<Dtype>)
+     .def("add_callback", &Solver_add_nccl)
+     .def("solve", static_cast<void (Solver<Dtype>::*)(const char*)>(
